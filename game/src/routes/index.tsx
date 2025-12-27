@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconRocket, IconTrophy, IconUsers, IconBrandGithub } from "@tabler/icons-react";
+import { IconBrandGithub, IconRocket, IconTrophy, IconUsers } from "@tabler/icons-react";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
@@ -44,8 +44,8 @@ function LandingPage() {
             BUBBLE
           </h1>
           <p className="max-w-md text-lg text-muted-foreground">
-            Build your startup empire. Navigate the tech bubble.
-            Race to unicorn status before the market crashes.
+            Build your startup empire. Navigate the tech bubble. Race to unicorn status before the
+            market crashes.
           </p>
         </div>
 

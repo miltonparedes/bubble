@@ -7,9 +7,9 @@
 
 export type {
   Database,
+  Enums,
+  Json,
   Tables,
   TablesInsert,
   TablesUpdate,
-  Enums,
-  Json,
 } from "./database.types.ts";

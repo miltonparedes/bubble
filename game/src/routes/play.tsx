@@ -40,9 +40,7 @@ function PlayPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
       <div className="absolute right-4 top-4 flex items-center gap-3">
-        {avatarUrl && (
-          <img src={avatarUrl} alt="" className="size-8 rounded-full" />
-        )}
+        {avatarUrl && <img src={avatarUrl} alt="" className="size-8 rounded-full" />}
         <span className="text-sm text-muted-foreground">
           {displayName}
         </span>
