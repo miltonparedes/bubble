@@ -1,0 +1,8 @@
+{
+  "name": "@bubble/content-generator",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "tasks": {
+    "generate": "echo 'TODO: Implement Claude content generation'"
+  }
+}
