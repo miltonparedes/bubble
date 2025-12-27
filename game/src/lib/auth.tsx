@@ -7,8 +7,11 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import type { AuthError, Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "./supabase";
+
+type AuthResult = { error: AuthError | null };
 
 interface AuthContextValue {
   user: User | null;
@@ -17,9 +20,9 @@ interface AuthContextValue {
   displayName: string;
   avatarUrl: string | null;
   isAnonymous: boolean;
-  signInWithGithub: () => Promise<void>;
-  signInAnonymously: () => Promise<void>;
-  signOut: () => Promise<void>;
+  signInWithGithub: () => Promise<AuthResult>;
+  signInAnonymously: () => Promise<AuthResult>;
+  signOut: () => Promise<AuthResult>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -56,22 +59,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signInWithGithub = useCallback(async () => {
-    await supabase.auth.signInWithOAuth({
+  const signInWithGithub = useCallback(async (): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
         redirectTo: `${window.location.origin}/play`,
       },
     });
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
   }, []);
 
-  const signInAnonymously = useCallback(async () => {
+  const signInAnonymously = useCallback(async (): Promise<AuthResult> => {
     const { error } = await supabase.auth.signInAnonymously();
-    if (error) throw error;
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
   }, []);
 
-  const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+  const signOut = useCallback(async (): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
   }, []);
 
   const displayName = useMemo(() => getDisplayName(user), [user]);

@@ -48,6 +48,8 @@
     "dev": "cd game && deno run -A npm:vite dev --port 2022",
     "build": "cd game && deno run -A npm:vite build",
     "preview": "cd game && deno run -A npm:vite preview",
+    "test": "cd game && deno run -A npm:vitest run",
+    "test:watch": "cd game && deno run -A npm:vitest",
     "lint": "deno lint",
     "fmt": "deno fmt",
     "fmt:check": "deno fmt --check",
