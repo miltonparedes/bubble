@@ -25,6 +25,11 @@ jwt_expiry = 3600
 enable_signup = true
 enable_anonymous_sign_ins = true
 
+[auth.external.github]
+enabled = true
+client_id = "env(GITHUB_CLIENT_ID)"
+secret = "env(GITHUB_CLIENT_SECRET)"
+
 [realtime]
 enabled = true
 

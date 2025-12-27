@@ -1,0 +1,120 @@
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import type { AuthError, Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
+import { supabase } from "./supabase";
+
+type AuthResult = { error: AuthError | null };
+
+interface AuthContextValue {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  displayName: string;
+  avatarUrl: string | null;
+  isAnonymous: boolean;
+  signInWithGithub: () => Promise<AuthResult>;
+  signInAnonymously: () => Promise<AuthResult>;
+  signOut: () => Promise<AuthResult>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+function getDisplayName(user: User | null): string {
+  if (!user) return "Anonymous";
+  const meta = user.user_metadata;
+  return meta?.full_name ?? meta?.name ?? meta?.user_name ?? "Anonymous";
+}
+
+function getAvatarUrl(user: User | null): string | null {
+  return user?.user_metadata?.avatar_url ?? null;
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signInWithGithub = useCallback(async (): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/play`,
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
+  }, []);
+
+  const signInAnonymously = useCallback(async (): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
+  }, []);
+
+  const signOut = useCallback(async (): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    }
+    return { error };
+  }, []);
+
+  const displayName = useMemo(() => getDisplayName(user), [user]);
+  const avatarUrl = useMemo(() => getAvatarUrl(user), [user]);
+  const isAnonymous = user?.is_anonymous ?? false;
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        displayName,
+        avatarUrl,
+        isAnonymous,
+        signInWithGithub,
+        signInAnonymously,
+        signOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

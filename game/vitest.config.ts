@@ -1,11 +1,15 @@
-import { defineConfig } from "vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import viteReact from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
 
 export default defineConfig({
-  envDir: resolve(import.meta.dirname!, ".."),
+  plugins: [react()],
+  test: {
+    environment: "happy-dom",
+    globals: true,
+    setupFiles: ["./src/test/setup.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
+  },
   resolve: {
     alias: {
       "@bubble/logic": resolve(import.meta.dirname!, "../packages/game-logic/mod.ts"),
@@ -15,16 +19,4 @@ export default defineConfig({
       "@": resolve(import.meta.dirname!, "src"),
     },
   },
-  server: {
-    fs: {
-      allow: [
-        resolve(import.meta.dirname!, ".."),
-      ],
-    },
-  },
-  plugins: [
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
 });
