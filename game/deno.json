@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@bubble/logic": "../packages/game-logic/mod.ts"
+  }
+}
