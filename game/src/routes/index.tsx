@@ -1,18 +1,38 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { IconRocket, IconTrophy, IconUsers, IconBrandGithub } from "@tabler/icons-react";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
 });
 
 function LandingPage() {
+  const { user, loading, signInWithGithub, signInAnonymously } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && !loading) {
+      navigate({ to: "/play" });
+    }
+  }, [user, loading, navigate]);
+
+  const handlePlayAsGuest = async () => {
+    await signInAnonymously();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Hero Section */}
       <main className="flex flex-1 flex-col items-center justify-center gap-12 p-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex items-center gap-3">
@@ -29,7 +49,6 @@ function LandingPage() {
           </p>
         </div>
 
-        {/* Features */}
         <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
           <FeatureCard
             icon={<IconRocket className="size-5" />}
@@ -48,7 +67,6 @@ function LandingPage() {
           />
         </div>
 
-        {/* Login Card */}
         <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
             <CardTitle>Enter the Game</CardTitle>
@@ -56,31 +74,15 @@ function LandingPage() {
               Sign in to start your startup journey
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <Input
-                    id="username"
-                    placeholder="founder@startup.io"
-                    autoComplete="username"
-                  />
-                </Field>
-                <Field orientation="horizontal" className="pt-2">
-                  <Button type="submit" className="flex-1" asChild>
-                    <Link to="/play">
-                      <IconRocket data-icon="inline-start" />
-                      Play Now
-                    </Link>
-                  </Button>
-                  <Button variant="outline" type="button">
-                    <IconBrandGithub data-icon="inline-start" />
-                    GitHub
-                  </Button>
-                </Field>
-              </FieldGroup>
-            </form>
+          <CardContent className="flex flex-col gap-3">
+            <Button onClick={handlePlayAsGuest} className="w-full">
+              <IconRocket data-icon="inline-start" />
+              Play as Guest
+            </Button>
+            <Button variant="outline" onClick={signInWithGithub} className="w-full">
+              <IconBrandGithub data-icon="inline-start" />
+              Sign in with GitHub
+            </Button>
           </CardContent>
         </Card>
       </main>

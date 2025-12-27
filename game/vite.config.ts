@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "node:path";
 
 export default defineConfig({
+  envDir: resolve(import.meta.dirname!, ".."),
   resolve: {
     alias: {
       "@bubble/logic": resolve(import.meta.dirname!, "../packages/game-logic/mod.ts"),
